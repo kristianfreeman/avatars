@@ -1,13 +1,12 @@
-class ElementHandler {
-  constructor(username) {
+class TwitterHandler {
+  constructor() {
     this.image = null
-    this.username = username
   }
 
   element(element) {
     const imageSrc = element.getAttribute('src')
-    if (imageSrc && imageSrc.includes('400x400')) {
-      this.image = imageSrc
+    if (imageSrc && imageSrc.includes('normal')) {
+      this.image = imageSrc.replace('normal', '400x400')
     }
   }
 }
@@ -30,9 +29,9 @@ async function handleRequest(request) {
 
   const url = new URL(request.url)
   if (url.pathname.includes('/twitter')) {
-    const handler = new ElementHandler(username)
-    const rewriter = new HTMLRewriter().on('img', handler)
-    const response = await fetch(`https://twitter.com/${username}`)
+    const handler = new TwitterHandler()
+    const rewriter = new HTMLRewriter().on('div.profile td.avatar img', handler)
+    const response = await fetch(`https://mobile.twitter.com/${username}`)
     await rewriter.transform(response).arrayBuffer()
     return fetch(handler.image)
   }
